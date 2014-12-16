@@ -120,7 +120,7 @@ var SkyRTC = function() {
             that.dataChannels = {};
             that.fileChannels = {};
             that.connections = [];
-            tjat.fileData = {};
+            that.fileData = {};
             that.emit('socket_closed', socket);
         };
 
