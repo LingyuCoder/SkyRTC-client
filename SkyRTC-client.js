@@ -4,7 +4,7 @@ var SkyRTC = function() {
     var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
     var nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
     var nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription); // order is very important: "RTCSessionDescription" defined in Nighly but useless
-    var moz = !! navigator.mozGetUserMedia;
+    var moz = !!navigator.mozGetUserMedia;
     var iceServer = {
         "iceServers": [{
             "url": "stun:stun.l.google.com:19302"
@@ -18,9 +18,9 @@ var SkyRTC = function() {
     /*                                                        */
     /**********************************************************/
     function EventEmitter() {
-        this.events = {};
-    }
-    //绑定事件函数
+            this.events = {};
+        }
+        //绑定事件函数
     EventEmitter.prototype.on = function(eventName, callback) {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(callback);
@@ -49,32 +49,32 @@ var SkyRTC = function() {
 
     /*******************基础部分*********************/
     function skyrtc() {
-        //本地media stream
-        this.localMediaStream = null;
-        //所在房间
-        this.room = "";
-        //接收文件时用于暂存接收文件
-        this.fileData = {};
-        //本地WebSocket连接
-        this.socket = null;
-        //本地socket的id，由后台服务器创建
-        this.me = null;
-        //保存所有与本地相连的peer connection， 键为socket id，值为PeerConnection类型
-        this.peerConnections = {};
-        //保存所有与本地连接的socket的id
-        this.connections = [];
-        //初始时需要构建链接的数目
-        this.numStreams = 0;
-        //初始时已经连接的数目
-        this.initializedStreams = 0;
-        //保存所有的data channel，键为socket id，值通过PeerConnection实例的createChannel创建
-        this.dataChannels = {};
-        //保存所有发文件的data channel及其发文件状态
-        this.fileChannels = {};
-        //保存所有接受到的文件
-        this.receiveFiles = {};
-    }
-    //继承自事件处理器，提供绑定事件和触发事件的功能
+            //本地media stream
+            this.localMediaStream = null;
+            //所在房间
+            this.room = "";
+            //接收文件时用于暂存接收文件
+            this.fileData = {};
+            //本地WebSocket连接
+            this.socket = null;
+            //本地socket的id，由后台服务器创建
+            this.me = null;
+            //保存所有与本地相连的peer connection， 键为socket id，值为PeerConnection类型
+            this.peerConnections = {};
+            //保存所有与本地连接的socket的id
+            this.connections = [];
+            //初始时需要构建链接的数目
+            this.numStreams = 0;
+            //初始时已经连接的数目
+            this.initializedStreams = 0;
+            //保存所有的data channel，键为socket id，值通过PeerConnection实例的createChannel创建
+            this.dataChannels = {};
+            //保存所有发文件的data channel及其发文件状态
+            this.fileChannels = {};
+            //保存所有接受到的文件
+            this.receiveFiles = {};
+        }
+        //继承自事件处理器，提供绑定事件和触发事件的功能
     skyrtc.prototype = new EventEmitter();
 
 
@@ -129,6 +129,7 @@ var SkyRTC = function() {
             that.connections = data.connections;
             that.me = data.you;
             that.emit("get_peers", that.connections);
+            that.emit('connected', socket);
         });
 
         this.on("_ice_candidate", function(data) {
@@ -182,8 +183,6 @@ var SkyRTC = function() {
             that.addDataChannels();
             that.sendOffers();
         });
-
-        this.emit('connected', socket);
     };
 
 
@@ -194,8 +193,8 @@ var SkyRTC = function() {
     skyrtc.prototype.createStream = function(options) {
         var that = this;
 
-        options.video = !! options.video;
-        options.audio = !! options.audio;
+        options.video = !!options.video;
+        options.audio = !!options.audio;
 
         if (getUserMedia) {
             this.numStreams++;
@@ -214,7 +213,7 @@ var SkyRTC = function() {
             that.emit("stream_create_error", new Error('WebRTC is not yet supported in this browser.'));
         }
     };
-    
+
     //将本地流添加到所有的PeerConnection实例中
     skyrtc.prototype.addStreams = function() {
         var i, m,
@@ -305,7 +304,7 @@ var SkyRTC = function() {
     //创建与其他用户连接的PeerConnections
     skyrtc.prototype.createPeerConnections = function() {
         var i, m;
-        for (i = 0, m = rtc.connections.length; i < m; i++) {
+        for (i = 0, m = this.connections.length; i < m; i++) {
             this.createPeerConnection(this.connections[i]);
         }
     };
@@ -348,11 +347,11 @@ var SkyRTC = function() {
         if (!pc) return;
         pc.close();
     };
-    
+
 
     /***********************数据通道连接部分*****************************/
 
-    
+
     //消息广播
     skyrtc.prototype.broadcast = function(message) {
         var socketId;
@@ -370,7 +369,7 @@ var SkyRTC = function() {
             }));
         }
     };
-    
+
     //对所有的PeerConnections创建Data channel
     skyrtc.prototype.addDataChannels = function() {
         var connection;
@@ -667,7 +666,7 @@ var SkyRTC = function() {
         };
         that.emit("receive_file_ask", sendId, socketId, fileName, fileSize);
     };
-   
+
     //发送同意接收文件信令
     skyrtc.prototype.sendFileAccept = function(sendId) {
         var that = this,
